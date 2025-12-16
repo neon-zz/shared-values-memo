@@ -1,0 +1,277 @@
+/* ================================
+   全体レイアウト
+================================ */
+
+/* ページ全体の基本設定 */
+body {
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 16px;              /* ← 少し小さめにして全体を締める */
+  line-height: 1.6;
+  background: #fff;
+  color: #111;
+  padding: 16px;
+  margin: 0;
+}
+
+/* タイトル中央寄せ */
+.title {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+
+
+/* ================================
+   入力フォーム・ボタン
+================================ */
+
+/* 入力・セレクト・ボタン共通 */
+input,
+select,
+button {
+  width: 100%;
+  padding: 10px;                /* ← 少し細く */
+  margin: 6px 0;
+  font-size: 16px;
+}
+
+/* ボタン共通 */
+button {
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 質問追加エリア */
+.add-area {
+  margin-bottom: 20px;
+}
+
+
+/* ================================
+   戻るボタン
+================================ */
+
+#backBtn {
+  background: #eaf4ff;
+  color: #005bbb;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+
+/* ================================
+   フォルダ（一覧ページ）
+================================ */
+
+.folder {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+
+.folder-header {
+  background: #f6f6f6;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.folder-header a {
+  font-size: 14px;
+  text-decoration: none;
+  color: #0077cc;
+}
+
+.folder-body {
+  padding: 8px 12px;
+}
+
+
+/* ================================
+   カード（質問1件）
+================================ */
+
+/* カード全体 */
+.card {
+  border-bottom: 1px solid #eee;
+  padding: 6px 0;               /* ← 閉じたときに細く見せる */
+}
+
+.card:last-child {
+  border-bottom: none;
+}
+
+/* 上段（質問＋ボタン） */
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 質問文 */
+.question {
+  font-weight: 700;
+  font-size: 15px;              /* ← 少し小さめ */
+  flex: 1;
+}
+
+/* 質問クリック可能 */
+.question.clickable {
+  cursor: pointer;
+}
+
+/* ▶ ▾ アイコン */
+.question.clickable::after {
+  content: " ▸";
+  font-size: 13px;
+  color: #666;
+}
+
+.card.open .question.clickable::after {
+  content: " ▾";
+}
+
+
+/* ================================
+   操作ボタン
+================================ */
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.edit-a {
+  background: #0077cc;
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.delete {
+  background: #cc3333;
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+
+/* ================================
+   回答エリア（最初は非表示）
+================================ */
+
+/* 回答全体を包む */
+.answers {
+  display: none;
+  margin-top: 8px;
+}
+
+/* カードが開いたら表示 */
+.card.open .answers {
+  display: block;
+}
+
+/* 各回答ボックス */
+.answer-box {
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+/* なな回答 */
+.answer-nana {
+  background: #fdf0f8;
+}
+
+.answer-nana::before {
+  content: "なな";
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* レイ回答 */
+.answer-rei {
+  background: #eef4ff;
+}
+
+.answer-rei::before {
+  content: "レイ";
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* 未入力表示 */
+.muted {
+  color: #888;
+  font-size: 14px;
+}
+
+
+/* ================================
+   未回答の視覚マーク
+================================ */
+
+/* どちらか未回答 */
+.has-unanswered {
+  border-left: 3px solid #f2b705;
+  padding-left: 6px;
+}
+
+/* 両方未回答 */
+.both-unanswered {
+  border-left-color: #e74c3c;
+}
+
+
+/* ================================
+   カテゴリページ専用
+================================ */
+
+.category-title {
+  text-align: center;
+  font-size: 22px;
+  margin: 16px 0 20px;
+}
+
+/* カテゴリ切替ナビ */
+.category-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.cat-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #eee;
+  text-decoration: none;
+  font-size: 13px;
+  color: #333;
+}
+
+.cat-btn.active {
+  background: #0077cc;
+  color: #fff;
+}
+
+/* カテゴリページのカード強調 */
+.category-card {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+}

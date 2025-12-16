@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>共有価値観メモ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- タイトル -->
+  <h1 class="title">共有価値観メモ</h1>
+
+  <!-- 戻るボタン（カテゴリページ時のみJSで表示） -->
+  <button id="backBtn" style="display:none;">← 一覧に戻る</button>
+
+  <!-- 検索 -->
+  <input
+    type="text"
+    id="search"
+    placeholder="キーワード検索"
+  />
+
+  <!-- 未回答フィルター -->
+  <select id="filter">
+    <option value="">すべて表示</option>
+    <option value="nana">なな未回答</option>
+    <option value="rei">レイ未回答</option>
+    <option value="any">どちらか未回答</option>
+  </select>
+
+  <!-- 質問追加エリア（カテゴリページでは非表示） -->
+  <section class="add-area" id="addArea">
+
+    <!-- カテゴリ選択 -->
+    <select id="category">
+      <option value="食事">🍚 食事</option>
+      <option value="生活">🏠 生活</option>
+      <option value="お金">💰 お金</option>
+      <option value="感情">💬 感情</option>
+      <option value="__other__">その他</option>
+    </select>
+
+    <!-- その他カテゴリ入力 -->
+    <input
+      type="text"
+      id="categoryOther"
+      placeholder="カテゴリ名を入力"
+      style="display:none;"
+    />
+
+    <!-- 質問入力 -->
+    <input
+      type="text"
+      id="question"
+      placeholder="質問（例：お米の硬さ）"
+    />
+
+    <button id="add">質問を保存</button>
+  </section>
+
+  <!-- 描画エリア -->
+  <div id="categories"></div>
+
+  <!-- JS -->
+  <script src="script.js"></script>
+</body>
+</html>
