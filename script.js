@@ -4,9 +4,9 @@
 
 /* ===== Firebase 初期化 ===== */
 const firebaseConfig = {
-  apiKey: "ここにAPI_KEY",
-  authDomain: "xxxxx.firebaseapp.com",
-  projectId: "xxxxx",
+    apiKey: "AIzaSyCDG1H71ESjGJQ5NV25Tc7NYBBfUDw",
+    authDomain: "shared-values-memo.firebaseapp.com",
+    projectId: "shared-values-memo",
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -26,46 +26,30 @@ const addArea = document.getElementById("addArea");
 /* ===== ユーザー管理 ===== */
 
 // ユーザー選択時に呼ばれる
-window.setUser = function (user) {
+window.setUser = function(user) {
   currentUser = user;
   localStorage.setItem("user", user);
-
-  // ユーザー選択画面を消す
-  const select = document.getElementById("userSelect");
-  if (select) select.style.display = "none";
-
-  // 画面を再描画（← これが重要）
+  document.getElementById("userSelect").style.display = "none";
   render();
-}
+};
 
 // ページ読み込み時
 window.onload = () => {
   const select = document.getElementById("userSelect");
-
-  if (currentUser) {
-    // すでに選択済みなら最初から非表示
-    if (select) select.style.display = "none";
+  if (!currentUser) {
+    select.style.display = "flex";
   } else {
-    // 未選択なら強制表示
-    if (select) select.style.display = "flex";
+    select.style.display = "none";
   }
-
-  render();
 };
-
 
 /* ================================
   Firestore 読み込み（最重要）
 ================================ */
-db.collection("values")
-  .orderBy("updatedAt", "desc")
-  .onSnapshot(snapshot => {
-    items = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    render();
-  });
+db.collection("values").onSnapshot(snap => {
+  items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  render();
+});
 
 /* ================================
   Firestore 保存
@@ -100,25 +84,28 @@ document.getElementById("add").onclick = async () => {
   描画
 ================================ */
 function render() {
-  categoriesEl.innerHTML = "";
+  const area = document.getElementById("categories");
+  area.innerHTML = "";
 
-  const hash = new URLSearchParams(location.hash.slice(1));
-  const currentCategory = hash.get("category");
-
-  addArea.style.display = currentCategory ? "none" : "block";
-  backBtn.style.display = currentCategory ? "block" : "none";
-
-  let filtered = [...items];
-
-  if (currentCategory) {
-    const cat = decodeURIComponent(currentCategory);
-    filtered = filtered.filter(i => i.category === cat);
-  }
-
-  filtered.forEach(item => {
-    categoriesEl.appendChild(card(item));
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div>Q：${item.question}</div>
+      <div>なな：${item.answers?.nana || "未回答"}</div>
+      <div>レイ：${item.answers?.rei || "未回答"}</div>
+      <button>回答</button>
+    `;
+    div.querySelector("button").onclick = async () => {
+      if (!currentUser) return alert("ユーザー選んでね");
+      const t = prompt("回答", item.answers[currentUser]);
+      if (t === null) return;
+      item.answers[currentUser] = t;
+      await db.collection("values").doc(item.id).set(item);
+    };
+    area.appendChild(div);
   });
 }
+
 
 /* ================================
   カード
@@ -149,20 +136,6 @@ function card(item) {
   /* 質問クリックで開閉 */
   div.querySelector(".question").onclick = () => {
     div.classList.toggle("open");
-  };
-
-  /* 回答 */
-  div.querySelector(".edit-a").onclick = async () => {
-    if (!currentUser) return alert("ユーザーを選んでね");
-
-    const label = currentUser === "nana" ? "なな" : "ゆう";
-    const t = prompt(`${label}の回答`, item.answers[currentUser]);
-    if (t === null) return;
-
-    item.answers[currentUser] = t.trim();
-    item.updatedAt = Date.now();
-
-    await saveToFirestore(item);
   };
 
   /* 削除 */

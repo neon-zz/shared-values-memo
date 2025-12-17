@@ -21,19 +21,12 @@
   <!-- 戻るボタン（カテゴリページ時のみJSで表示） -->
   <button id="backBtn" style="display:none;">← 一覧に戻る</button>
 
-  <!-- 検索 -->
-  <input
-    type="text"
-    id="search"
-    placeholder="キーワード検索"
-  />
-
+  <input id="search" placeholder="検索" />
   <!-- 未回答フィルター -->
   <select id="filter">
     <option value="">すべて表示</option>
     <option value="nana">なな未回答</option>
     <option value="rei">レイ未回答</option>
-    <option value="any">どちらか未回答</option>
   </select>
 
   <!-- 質問追加エリア（カテゴリページでは非表示） -->
@@ -69,24 +62,9 @@
   <!-- 描画エリア -->
   <div id="categories"></div>
 
-<!-- Firebase SDK（compat版） -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<script>
-  // Firebase 設定
-  const firebaseConfig = {
-    apiKey: "AIzaSyCDG1H71ESjGJQ5NV25Tc7NYBBfUDw",
-    authDomain: "shared-values-memo.firebaseapp.com",
-    projectId: "shared-values-memo",
-    storageBucket: "shared-values-memo.firebasestorage.app",
-    messagingSenderId: "395861138372",
-    appId: "1:395861138372:web:4f646d0a2d90e0d313a291",
-  };
-
-  // 初期化
-  firebase.initializeApp(firebaseConfig);
-</script>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <!-- あなたのJS -->
 <script src="script.js"></script>
