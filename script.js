@@ -89,36 +89,29 @@ document.getElementById("add").onclick = async () => {
   描画
 ================================ */
 function render() {
-  const area = document.getElementById("categories");
-  area.innerHTML = "";
+    categoriesEl.innerHTML = "";
+
 
   // URLの #category を取得
   const hash = new URLSearchParams(location.hash.slice(1));
   const currentCategory = hash.get("category");
 
   /* ===== 表示切り替え ===== */
-  document.getElementById("addArea").style.display =
-    currentCategory ? "none" : "block";
-  document.getElementById("backBtn").style.display =
-    currentCategory ? "block" : "none";
+  addArea.style.display = currentCategory ? "none" : "block";
+  backBtn.style.display = currentCategory ? "block" : "none";
 
   /* ===== カテゴリページ ===== */
   if (currentCategory) {
     const catName = decodeURIComponent(currentCategory);
 
-    // タイトル
-    const title = document.createElement("h2");
-    title.className = "category-title";
-    title.textContent = catName;
-    area.appendChild(title);
-
     // カードだけ表示
     items
-      .filter(i => i.category === catName)
-      .forEach(item => area.appendChild(createCard(item)));
+      .filter(i => i.category === cat)
+      .forEach(item => categoriesEl.appendChild(card(item)));
 
     return;
   }
+
 
   /* ===== 一覧ページ（フォルダUI） ===== */
   const grouped = {};
@@ -131,37 +124,44 @@ function render() {
     const folder = document.createElement("div");
     folder.className = "folder";
 
-    folder.innerHTML = `
-      <div class="folder-header">
-        <span>${cat}（${grouped[cat].length}）</span>
-        <a href="#category=${encodeURIComponent(cat)}">開く</a>
-      </div>
+    const header = document.createElement("div");
+    header.className = "folder-header";
+    header.innerHTML = `
+      <span>${cat}（${grouped[cat].length}）</span>
+      <a href="#category=${encodeURIComponent(cat)}">開く</a>
     `;
 
-    area.appendChild(folder);
+    folder.appendChild(header);
+    categoriesEl.appendChild(folder);
   });
 }
+
 
 /* ================================
   カード
 ================================ */
-function createCard(item) {
+function card(item) {
   const div = document.createElement("div");
   div.className = "card";
 
-    div.innerHTML = `
-    <div class="question clickable">Q：${item.question}</div>
+  div.innerHTML = `
+    <div class="card-top">
+      <div class="question clickable">Q：${item.question}</div>
+      <div class="actions">
+        <button class="edit-a">回答</button>
+        <button class="delete">削除</button>
+      </div>
+    </div>
 
     <div class="answers">
       <div class="answer-box answer-nana">
-        ${item.answers?.nana || "<span class='muted'>なな未回答</span>"}
+        ${item.answers.nana || "<span class='muted'>未入力</span>"}
       </div>
       <div class="answer-box answer-rei">
-        ${item.answers?.rei || "<span class='muted'>レイ未回答</span>"}
+        ${item.answers.rei || "<span class='muted'>未入力</span>"}
       </div>
     </div>
-    <button class="edit">回答</button>
-   `;
+  `;
 
   /* 開閉 */
   div.querySelector(".question").onclick = () => {
@@ -172,8 +172,7 @@ function createCard(item) {
   div.querySelector(".edit").onclick = async () => {
     if (!currentUser) return alert("ユーザーを選んでね");
 
-    const label = currentUser === "nana" ? "なな" : "レイ";
-    const t = prompt(`${label}の回答`, item.answers[currentUser]);
+    const t = prompt("回答", item.answers[currentUser]);
     if (t === null) return;
 
     item.answers[currentUser] = t;
@@ -182,9 +181,14 @@ function createCard(item) {
     await db.collection("values").doc(item.id).set(item);
   };
 
+  // 削除（←これが無かった）
+  div.querySelector(".delete").onclick = async () => {
+    if (!confirm("この質問を削除する？")) return;
+    await db.collection("values").doc(item.id).delete();
+  };
+
   return div;
 }
-
 
 /* 戻る */
 document.getElementById("backBtn").onclick = () => {
