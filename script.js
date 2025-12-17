@@ -3,22 +3,14 @@
 ================================ */
 
 /* ===== Firebase 初期化 ===== */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyCDG1H71ESjGJQ5NV25Tc7NYBBfUDw",
+  authDomain: "shared-values-memo.firebaseapp.com",
+  projectId: "shared-values-memo",
+};
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCDG1H71ESjGZ26GJQ5NV25Tc7NYBBfUDw",
-    authDomain: "shared-values-memo.firebaseapp.com",
-    projectId: "shared-values-memo",
-    storageBucket: "shared-values-memo.firebasestorage.app",
-    messagingSenderId: "395861138372",
-    appId: "1:395861138372:web:4f646d0a2d90e0d313a291",
-    measurementId: "G-D18EQHMYDF"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 /* ===== 状態 ===== */
 let items = [];
@@ -26,17 +18,8 @@ let currentUser = localStorage.getItem("user"); // nana / rei
 
 /* ===== DOM ===== */
 const categoriesEl = document.getElementById("categories");
-const searchEl = document.getElementById("search");
-const filterEl = document.getElementById("filter");
 const backBtn = document.getElementById("backBtn");
 const addArea = document.getElementById("addArea");
-
-// 全カテゴリ取得（重複なし）
-function getAllCategories() {
-  return [...new Set(items.map(i => i.category))];
-}
-
-/* ===== ユーザー管理 ===== */
 
 // ユーザー選択時に呼ばれる
 window.setUser = function(user) {
@@ -49,62 +32,39 @@ window.setUser = function(user) {
 // ページ読み込み時
 window.onload = () => {
   const select = document.getElementById("userSelect");
-  if (!currentUser) {
-    select.style.display = "flex";
-  } else {
-    select.style.display = "none";
-  }
+  select.style.display = currentUser ? "none" : "flex";
 };
 
-/* ================================
-  Firestore 読み込み（最重要）
-================================ */
+/* ===== Firestore 読み込み ===== */
 db.collection("values")
-  .orderBy("updatedAt") // ← これを追加
-  .onSnapshot(snap => {
-    items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  .orderBy("updatedAt", "desc")
+  .onSnapshot(snapshot => {
+    items = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
     render();
   });
 
-/* ================================
-  Firestore 保存
-================================ */
-function saveToFirestore(item) {
-  return db.collection("values")
-    .doc(item.id)
-    .set(item, { merge: true });
-}
-
-/* ================================
-  質問追加
-================================ */
+/* ===== 質問追加 ===== */
 document.getElementById("add").onclick = async () => {
   const category = document.getElementById("category").value;
   const question = document.getElementById("question").value.trim();
   if (!question) return alert("質問を入力してね");
 
-  const ref = db.collection("values").doc(); // ← 先にID作る
-
-  const item = {
-    id: ref.id, // ← これが超重要
+  await db.collection("values").add({
     category,
     question,
     answers: { nana: "", rei: "" },
     updatedAt: Date.now()
-  };
-
-  await ref.set(item);
+  });
 
   document.getElementById("question").value = "";
 };
 
-
-/* ================================
-  描画
-================================ */
+/* ===== 描画 ===== */
 function render() {
     categoriesEl.innerHTML = "";
-
 
   // URLの #category を取得
   const hash = new URLSearchParams(location.hash.slice(1));
@@ -117,11 +77,9 @@ function render() {
 /* ===== カテゴリページ ===== */
 if (currentCategory) {
   const catName = decodeURIComponent(currentCategory);
-
   items
-    .filter(i => i.category === catName)
+    .filter(i => i.category === cat)
     .forEach(item => categoriesEl.appendChild(card(item)));
-
   return;
 }
 
@@ -136,22 +94,18 @@ if (currentCategory) {
     const folder = document.createElement("div");
     folder.className = "folder";
 
-    const header = document.createElement("div");
-    header.className = "folder-header";
-    header.innerHTML = `
-      <span>${cat}（${grouped[cat].length}）</span>
-      <a href="#category=${encodeURIComponent(cat)}">開く</a>
+    folder.innerHTML = `
+      <div class="folder-header">
+        <span>${cat}（${grouped[cat].length}）</span>
+        <a href="#category=${encodeURIComponent(cat)}">開く</a>
+      </div>
     `;
 
-    folder.appendChild(header);
     categoriesEl.appendChild(folder);
   });
 }
 
-
-/* ================================
-  カード
-================================ */
+/* ===== カード ===== */
 function card(item) {
   const div = document.createElement("div");
   div.className = "card";
@@ -183,13 +137,11 @@ function card(item) {
 /* 回答 */
 div.querySelector(".edit-a").onclick = async () => {
   if (!currentUser) return alert("ユーザーを選んでね");
-
   const t = prompt("回答", item.answers[currentUser]);
   if (t === null) return;
 
   item.answers[currentUser] = t;
   item.updatedAt = Date.now();
-
   await db.collection("values").doc(item.id).set(item);
 };
 
@@ -203,8 +155,4 @@ div.querySelector(".delete").onclick = async () => {
 }
 
 /* 戻る */
-document.getElementById("backBtn").onclick = () => {
-  location.hash = "";
-};
-
-window.addEventListener("hashchange", render);
+backBtn.onclick = () => location.hash = "";

@@ -22,9 +22,10 @@
 <button id="backBtn" style="display:none;">← 一覧に戻る</button>
 
 <!-- 描画エリア（1つだけ！） -->
-<div id="categories"></div>
+ <input id="search" placeholder="検索" />
 
-  <input id="search" placeholder="検索" />
+<select id="filter">
+
   <!-- 未回答フィルター -->
   <select id="filter">
     <option value="">すべて表示</option>
@@ -44,23 +45,16 @@
       <option value="__other__">その他</option>
     </select>
 
-    <!-- その他カテゴリ入力 -->
-    <input
-      type="text"
-      id="categoryOther"
-      placeholder="カテゴリ名を入力"
-      style="display:none;"
-    />
-
     <!-- 質問入力 -->
-    <input
-      type="text"
-      id="question"
-      placeholder="質問（例：お米の硬さ）"
-    />
+    <input id="question" placeholder="質問（例：お米の硬さ）" />
+  <button id="add">質問を保存</button>
+</section>
 
-    <button id="add">質問を保存</button>
-  </section>
+<div id="categories"></div>
+
+<!-- Firebase SDK（compat版） -->
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
 
 <!-- あなたのJS -->
 <script src="script.js"></script>
