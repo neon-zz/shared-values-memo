@@ -2,6 +2,24 @@
    全体レイアウト
 ================================ */
 
+.user-select {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-select button {
+  width: 200px;
+  font-size: 20px;
+}
+
+
 /* ページ全体の基本設定 */
 body {
   font-family: "Noto Sans JP", sans-serif;

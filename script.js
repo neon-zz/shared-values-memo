@@ -1,254 +1,160 @@
 /* ================================
-  共有価値観メモ
-  - 一覧ページ（フォルダUI）
-  - カテゴリページ（#category=〇〇）
-  - 未回答フィルター
-  - 編集 / 削除
+  共有価値観メモ（Firestore版）
 ================================ */
 
-/* ===== データ読み込み ===== */
-let items = JSON.parse(localStorage.getItem("values")) || [];
+/* ===== Firebase 初期化 ===== */
+const firebaseConfig = {
+  apiKey: "ここにAPI_KEY",
+  authDomain: "xxxxx.firebaseapp.com",
+  projectId: "xxxxx",
+};
 
-/* ===== DOM取得 ===== */
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ===== 状態 ===== */
+let items = [];
+let currentUser = localStorage.getItem("user"); // nana / rei
+
+/* ===== DOM ===== */
 const categoriesEl = document.getElementById("categories");
 const searchEl = document.getElementById("search");
 const filterEl = document.getElementById("filter");
-const categorySelect = document.getElementById("category");
-const categoryOtherInput = document.getElementById("categoryOther");
-const questionInput = document.getElementById("question");
 const backBtn = document.getElementById("backBtn");
 const addArea = document.getElementById("addArea");
 
-/* ユーティリティ */
-
-// 全カテゴリ取得（重複なし）
-function getAllCategories() {
-  return [...new Set(items.map(i => i.category))];
+/* ===== ユーザー選択 ===== */
+function setUser(user) {
+  currentUser = user;
+  localStorage.setItem("user", user);
+  document.getElementById("userSelect").style.display = "none";
 }
 
-// 保存
-function save() {
-  localStorage.setItem("values", JSON.stringify(items));
-}
-
-/* その他カテゴリ切り替え */
-categorySelect.onchange = () => {
-  categoryOtherInput.style.display =
-    categorySelect.value === "__other__" ? "block" : "none";
+window.onload = () => {
+  if (currentUser) {
+    document.getElementById("userSelect").style.display = "none";
+  }
 };
 
-/* 質問追加 */
-document.getElementById("add").onclick = () => {
-  let category = categorySelect.value;
-  const question = questionInput.value.trim();
+/* ================================
+  Firestore 読み込み（最重要）
+================================ */
+db.collection("values")
+  .orderBy("updatedAt", "desc")
+  .onSnapshot(snapshot => {
+    items = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    render();
+  });
 
+/* ================================
+  Firestore 保存
+================================ */
+function saveToFirestore(item) {
+  return db.collection("values")
+    .doc(item.id)
+    .set(item, { merge: true });
+}
+
+/* ================================
+  質問追加
+================================ */
+document.getElementById("add").onclick = async () => {
+  const category = document.getElementById("category").value;
+  const question = document.getElementById("question").value.trim();
   if (!question) return alert("質問を入力してね");
 
-  if (category === "__other__") {
-    category = categoryOtherInput.value.trim();
-    if (!category) return alert("カテゴリ名を入力してね");
-  }
-
-  items.push({
-    id: crypto.randomUUID(),
+  const item = {
     category,
     question,
     answers: { nana: "", rei: "" },
     updatedAt: Date.now()
-  });
+  };
 
-  save();
-  // フォーム初期化
-  questionInput.value = "";
-  categoryOtherInput.value = "";
-  categoryOtherInput.style.display = "none";
-  categorySelect.value = "食事";
+  await db.collection("values").add(item);
 
-  render();
+  document.getElementById("question").value = "";
 };
 
-/* ===== イベント ===== */
-searchEl.oninput = render;
-filterEl.onchange = render;
-window.onhashchange = render;
-
-/* ===== 描画 ===== */
+/* ================================
+  描画
+================================ */
 function render() {
   categoriesEl.innerHTML = "";
 
-  const word = searchEl.value.trim();
-  const filter = filterEl.value;
-
-  // URLの #category を取得
   const hash = new URLSearchParams(location.hash.slice(1));
   const currentCategory = hash.get("category");
 
-  /* ===== UI表示切替 ===== */
   addArea.style.display = currentCategory ? "none" : "block";
   backBtn.style.display = currentCategory ? "block" : "none";
 
   let filtered = [...items];
 
-  /* ===== キーワード検索 ===== */
-  if (word) {
-    filtered = filtered.filter(i =>
-      i.category.includes(word) ||
-      i.question.includes(word) ||
-      i.answers.nana.includes(word) ||
-      i.answers.rei.includes(word)
-    );
-  }
-
-  /* ===== 未回答フィルター ===== */
-  filtered = filtered.filter(i => {
-    if (filter === "nana") return !i.answers.nana;
-    if (filter === "rei") return !i.answers.rei;
-    if (filter === "any") return !i.answers.nana || !i.answers.rei;
-    return true;
-  }); 
-
-  /* ===== カテゴリページ ===== */
   if (currentCategory) {
-    const categoryName = decodeURIComponent(currentCategory);
-
-    /* --- カテゴリ移動ナビ --- */
-    const nav = document.createElement("div");
-    nav.className = "category-nav";
-
-    getAllCategories().forEach(cat => {
-      const btn = document.createElement("a");
-      btn.href = `#category=${encodeURIComponent(cat)}`;
-      btn.textContent = cat;
-      btn.className = cat === categoryName
-        ? "cat-btn active": "cat-btn";
-      nav.appendChild(btn);
-    });
-
-    categoriesEl.appendChild(nav);
-
-    /* --- カテゴリタイトル --- */
-    const title = document.createElement("h2");
-    title.className = "category-title";
-    title.textContent = categoryName;
-    categoriesEl.appendChild(title);
-
-  // カードのみ
-    filtered
-      .filter(i => i.category === categoryName)
-      .forEach(i => categoriesEl.appendChild(card(i)));
-
-    return;
+    const cat = decodeURIComponent(currentCategory);
+    filtered = filtered.filter(i => i.category === cat);
   }
 
-  /*  一覧ページ */
-  const grouped = {};
-  filtered.forEach(i => {
-    grouped[i.category] ||= [];
-    grouped[i.category].push(i);
-  });
-
-  Object.keys(grouped).forEach(cat => {
-    const folder = document.createElement("div");
-    folder.className = "folder";
-
-    const header = document.createElement("div");
-    header.className = "folder-header";
-    header.innerHTML = `
-      <span>${cat}（${grouped[cat].length}）</span>
-      <a href="#category=${encodeURIComponent(cat)}">開く</a>
-    `;
-
-    const body = document.createElement("div");
-    body.className = "folder-body";
-
-    grouped[cat].forEach(i => body.appendChild(card(i)));
-
-    folder.append(header, body);
-    categoriesEl.appendChild(folder);
+  filtered.forEach(item => {
+    categoriesEl.appendChild(card(item));
   });
 }
 
-/* カード1件 */
+/* ================================
+  カード
+================================ */
 function card(item) {
   const div = document.createElement("div");
   div.className = "card";
 
-  /* ===== 未回答判定 ===== */
-  const nanaEmpty = !item.answers.nana;
-  const reiEmpty  = !item.answers.rei;
-
-  if (nanaEmpty || reiEmpty) div.classList.add("has-unanswered");
-  if (nanaEmpty && reiEmpty) div.classList.add("both-unanswered");
-
-div.innerHTML = `
- <div class="card-top">
-      <!-- ▼ 質問（クリック対象） -->
-      <div class="question clickable">
-        Q：${item.question}
-      </div>
-
+  div.innerHTML = `
+    <div class="card-top">
+      <div class="question clickable">Q：${item.question}</div>
       <div class="actions">
         <button class="edit-a">回答</button>
         <button class="delete">削除</button>
       </div>
     </div>
 
- <!-- ▼ 回答（最初は非表示） -->
     <div class="answers">
       <div class="answer-box answer-nana">
         ${item.answers.nana || "<span class='muted'>未入力</span>"}
       </div>
-
       <div class="answer-box answer-rei">
         ${item.answers.rei || "<span class='muted'>未入力</span>"}
       </div>
     </div>
   `;
 
-  /* ===== 質問クリックで開閉 ===== */
+  /* 質問クリックで開閉 */
   div.querySelector(".question").onclick = () => {
     div.classList.toggle("open");
   };
 
-   /* ===== 回答者選択 ===== */
-  div.querySelector(".edit-a").onclick = () => {
-    const who = prompt(
-    "誰の回答を編集しますか？\n\n1：私（なな）\n2：レイ",
-      "1"
-    );
-    if (who === null) return;
+  /* 回答 */
+  div.querySelector(".edit-a").onclick = async () => {
+    if (!currentUser) return alert("ユーザーを選んでね");
 
-    if (who === "1") {
-      const t = prompt("ななの回答", item.answers.nana);
-      if (t !== null) item.answers.nana = t.trim();
-    }
+    const label = currentUser === "nana" ? "なな" : "レイ";
+    const t = prompt(`${label}の回答`, item.answers[currentUser]);
+    if (t === null) return;
 
-    if (who === "2") {
-      const t = prompt("レイの回答", item.answers.rei);
-      if (t !== null) item.answers.rei = t.trim();
-    }
-
+    item.answers[currentUser] = t.trim();
     item.updatedAt = Date.now();
-    save();
-    render();
+
+    await saveToFirestore(item);
   };
 
-  /* ===== 削除 ===== */
-  div.querySelector(".delete").onclick = () => {
-    if (confirm("削除する？")) {
-      items = items.filter(x => x.id !== item.id);
-      save();
-      render();
-    }
+  /* 削除 */
+  div.querySelector(".delete").onclick = async () => {
+    if (!confirm("削除する？")) return;
+    await db.collection("values").doc(item.id).delete();
   };
 
   return div;
 }
 
-/* 一覧に戻  */
-backBtn.onclick = () => {
-  location.hash = "";
-};
-
-/* 初期描画 */
-render();
+/* 戻る */
+backBtn.onclick = () => location.hash = "";
