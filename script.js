@@ -78,10 +78,15 @@ function render() {
 if (currentCategory) {
   const catName = decodeURIComponent(currentCategory);
 
-  items
-    .filter(i => i.category === catName) // ← 修正ポイント
-    .forEach(item => categoriesEl.appendChild(card(item)));
-  return;
+items
+  .filter(item => {
+    if (searchWord && !item.question.includes(searchWord)) return false;
+
+    if (filter === "nana" && item.answers.nana) return false;
+    if (filter === "rei" && item.answers.rei) return false;
+
+    return true;
+  });
 }
 
   /* ===== 一覧ページ（フォルダUI） ===== */
@@ -92,17 +97,33 @@ if (currentCategory) {
   });
 
 Object.keys(grouped).forEach(cat => {
+  const list = grouped[cat];
+
+  // ★ 未回答数を数える
+  const unansweredCount = list.filter(item =>
+    !item.answers.nana || !item.answers.rei
+  ).length;
+
   const folder = document.createElement("div");
   folder.className = "folder";
 
   const header = document.createElement("div");
   header.className = "folder-header";
-header.innerHTML = `
-  <span>${cat}（${grouped[cat].length}）</span>
-  <a href="#category=${encodeURIComponent(cat)}" class="open-btn">
-    開く
-  </a>
-`;
+
+  header.innerHTML = `
+    <span>
+      ${cat}（${list.length}）
+      <span class="folder-unanswered">
+        未回答：${unansweredCount}
+      </span>
+    </span>
+    <button class="open-btn" data-cat="${cat}">開く</button>
+  `;
+
+  // iPhone用ボタン
+  header.querySelector(".open-btn").onclick = () => {
+    location.hash = `category=${encodeURIComponent(cat)}`;
+  };
 
   folder.appendChild(header);
   categoriesEl.appendChild(folder);
@@ -113,6 +134,12 @@ header.innerHTML = `
 function card(item) {
   const div = document.createElement("div");
   div.className = "card";
+
+    if (!item.answers.nana && !item.answers.rei) {
+    div.classList.add("both-unanswered");
+  } else if (!item.answers.nana || !item.answers.rei) {
+    div.classList.add("has-unanswered");
+  }
 
   div.innerHTML = `
     <div class="card-top">

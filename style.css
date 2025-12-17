@@ -383,3 +383,8 @@ button:active,
     gap: 12px;
   }
 }
+.folder-unanswered {
+  font-size: 13px;
+  color: #e67e22;
+  margin-left: 6px;
+}
