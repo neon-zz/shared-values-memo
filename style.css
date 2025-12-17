@@ -199,13 +199,13 @@ button {
   margin-bottom: 4px;
 }
 
-/* レイ回答 */
+/* ゆう回答 */
 .answer-rei {
   background: #eef4ff;
 }
 
 .answer-rei::before {
-  content: "レイ";
+  content: "ゆう";
   display: block;
   font-size: 12px;
   font-weight: 700;
@@ -417,4 +417,25 @@ button:active,
 .category-tab.active {
   background: #1976d2;
   color: #fff;
+}
+
+.category-tabs {
+  position: sticky;
+  top: 0;                 /* ← 画面上部に固定 */
+  z-index: 1000;
+
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+
+  background: #fff;       /* ← 下が透けないように */
+  overflow-x: auto;
+
+  border-bottom: 1px solid #eee;
+}
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
 }
