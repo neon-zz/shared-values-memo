@@ -8,55 +8,72 @@
 </head>
 
 <body>
-    <!-- ユーザー選択画面 -->
+
+<!-- =====================
+  ユーザー選択画面
+===================== -->
 <div id="userSelect" class="user-select">
   <h2>あなたはどちら？</h2>
   <button onclick="setUser('nana')">なな</button>
   <button onclick="setUser('rei')">ゆう</button>
 </div>
 
-  <!-- タイトル -->
-  <h1 class="title">価値観共有</h1>
+<!-- =====================
+  タイトル
+===================== -->
+<h1 class="title">価値観共有</h1>
 
-<!-- 戻るボタン -->
+<!-- 戻るボタン（カテゴリページ時のみ表示） -->
 <button id="backBtn" style="display:none;">← 一覧に戻る</button>
 
-<!-- 描画エリア（1つだけ！） -->
- <input id="search" placeholder="検索" />
+<!-- =====================
+  検索
+===================== -->
+<input id="search" placeholder="検索" />
 
+<!-- =====================
+  未回答フィルター（★ここ重要）
+===================== -->
 <select id="filter">
+  <option value="">すべて表示</option>
+  <option value="nana">なな未回答</option>
+  <option value="rei">レイ未回答</option>
+</select>
 
-  <!-- 未回答フィルター -->
-  <select id="filter">
-    <option value="">すべて表示</option>
-    <option value="nana">なな未回答</option>
-    <option value="rei">レイ未回答</option>
+<!-- =====================
+  質問追加エリア
+===================== -->
+<section class="add-area" id="addArea">
+
+  <!-- カテゴリ選択 -->
+  <select id="category">
+    <option value="食事">🍚 食事</option>
+    <option value="生活">🏠 生活</option>
+    <option value="お金">💰 お金</option>
+    <option value="感情">💬 感情</option>
+    <option value="__other__">その他</option>
   </select>
 
-  <!-- 質問追加エリア（カテゴリページでは非表示） -->
-  <section class="add-area" id="addArea">
+  <!-- 質問入力 -->
+  <input id="question" placeholder="質問（例：お米の硬さ）" />
 
-    <!-- カテゴリ選択 -->
-    <select id="category">
-      <option value="食事">🍚 食事</option>
-      <option value="生活">🏠 生活</option>
-      <option value="お金">💰 お金</option>
-      <option value="感情">💬 感情</option>
-      <option value="__other__">その他</option>
-    </select>
-
-    <!-- 質問入力 -->
-    <input id="question" placeholder="質問（例：お米の硬さ）" />
   <button id="add">質問を保存</button>
 </section>
 
+<!-- =====================
+  描画エリア（1つだけ）
+===================== -->
 <div id="categories"></div>
 
-<!-- Firebase SDK（compat版） -->
+<!-- =====================
+  Firebase SDK（compat版）
+===================== -->
 <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
 
-<!-- あなたのJS -->
+<!-- =====================
+  あなたのJS
+===================== -->
 <script src="script.js"></script>
 
 </body>
