@@ -63,6 +63,24 @@
   <!-- 描画エリア -->
   <div id="categories"></div>
 
+  <!-- Firedase設定 -->
+   <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCDG1H71ESjGZ26GJQ5NV25Tc7NYBBfUDw",
+    authDomain: "shared-values-memo.firebaseapp.com",
+    projectId: "shared-values-memo",
+    storageBucket: "shared-values-memo.firebasestorage.app",
+    messagingSenderId: "395861138372",
+    appId: "1:395861138372:web:4f646d0a2d90e0d313a291",
+    measurementId: "G-D18EQHMYDF"
+  };
+
+  const app = initializeApp(firebaseConfig);
+</script>
+
   <!-- JS -->
   <script src="script.js"></script>
 </body>
