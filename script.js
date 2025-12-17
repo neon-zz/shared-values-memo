@@ -15,11 +15,26 @@ const db = firebase.firestore();
 /* ===== 状態 ===== */
 let items = [];
 let currentUser = localStorage.getItem("user"); // nana / rei
+let searchWord = "";
+let filterUser = "";
 
 /* ===== DOM ===== */
 const categoriesEl = document.getElementById("categories");
 const backBtn = document.getElementById("backBtn");
 const addArea = document.getElementById("addArea");
+const searchInput = document.getElementById("search");
+const filterSelect = document.getElementById("filter");
+
+searchInput.addEventListener("input", () => {
+  searchWord = searchInput.value.trim();
+  render();
+});
+
+filterSelect.addEventListener("change", () => {
+  filterUser = filterSelect.value;
+  render();
+});
+
 
 // ユーザー選択時に呼ばれる
 window.setUser = function(user) {
@@ -66,14 +81,6 @@ document.getElementById("add").onclick = async () => {
 function render() {
     categoriesEl.innerHTML = "";
 
-      const searchWord = document
-    .getElementById("search")
-    ?.value
-    .trim();
-
-      // ★ 追加：未回答フィルター
-  const filter = document.getElementById("filter")?.value;
-
   // URLの #category を取得
   const hash = new URLSearchParams(location.hash.slice(1));
   const currentCategory = hash.get("category");
@@ -90,7 +97,21 @@ if (currentCategory) {
   renderCategoryTabs(catName);
 
   items
-    .filter(item => item.category === catName)
+    .filter(item => {
+      // カテゴリ一致
+      if (item.category !== catName) return false;
+
+      // 🔍 検索
+      if (searchWord && !item.question.includes(searchWord)) {
+        return false;
+      }
+
+      // 👤 未回答フィルター
+      if (filterUser === "nana" && item.answers.nana) return false;
+      if (filterUser === "rei" && item.answers.rei) return false;
+
+      return true;
+    })
     .forEach(item => {
       categoriesEl.appendChild(card(item));
     });
@@ -215,9 +236,6 @@ function renderCategoryTabs(activeCat) {
     tabsEl.appendChild(btn);
   });
 }
-
-document.getElementById("filter").addEventListener("change", render);
-document.getElementById("search").addEventListener("input", render);
 
 /* 戻る */
 backBtn.onclick = () => location.hash = "";
