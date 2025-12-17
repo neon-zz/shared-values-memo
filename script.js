@@ -23,6 +23,11 @@ const filterEl = document.getElementById("filter");
 const backBtn = document.getElementById("backBtn");
 const addArea = document.getElementById("addArea");
 
+// 全カテゴリ取得（重複なし）
+function getAllCategories() {
+  return [...new Set(items.map(i => i.category))];
+}
+
 /* ===== ユーザー管理 ===== */
 
 // ユーザー選択時に呼ばれる
@@ -87,65 +92,101 @@ function render() {
   const area = document.getElementById("categories");
   area.innerHTML = "";
 
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <div>Q：${item.question}</div>
-      <div>なな：${item.answers?.nana || "未回答"}</div>
-      <div>レイ：${item.answers?.rei || "未回答"}</div>
-      <button>回答</button>
+  // URLの #category を取得
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const currentCategory = hash.get("category");
+
+  /* ===== 表示切り替え ===== */
+  document.getElementById("addArea").style.display =
+    currentCategory ? "none" : "block";
+  document.getElementById("backBtn").style.display =
+    currentCategory ? "block" : "none";
+
+  /* ===== カテゴリページ ===== */
+  if (currentCategory) {
+    const catName = decodeURIComponent(currentCategory);
+
+    // タイトル
+    const title = document.createElement("h2");
+    title.className = "category-title";
+    title.textContent = catName;
+    area.appendChild(title);
+
+    // カードだけ表示
+    items
+      .filter(i => i.category === catName)
+      .forEach(item => area.appendChild(createCard(item)));
+
+    return;
+  }
+
+  /* ===== 一覧ページ（フォルダUI） ===== */
+  const grouped = {};
+  items.forEach(i => {
+    grouped[i.category] ||= [];
+    grouped[i.category].push(i);
+  });
+
+  Object.keys(grouped).forEach(cat => {
+    const folder = document.createElement("div");
+    folder.className = "folder";
+
+    folder.innerHTML = `
+      <div class="folder-header">
+        <span>${cat}（${grouped[cat].length}）</span>
+        <a href="#category=${encodeURIComponent(cat)}">開く</a>
+      </div>
     `;
-    div.querySelector("button").onclick = async () => {
-      if (!currentUser) return alert("ユーザー選んでね");
-      const t = prompt("回答", item.answers[currentUser]);
-      if (t === null) return;
-      item.answers[currentUser] = t;
-      await db.collection("values").doc(item.id).set(item);
-    };
-    area.appendChild(div);
+
+    area.appendChild(folder);
   });
 }
-
 
 /* ================================
   カード
 ================================ */
-function card(item) {
+function createCard(item) {
   const div = document.createElement("div");
   div.className = "card";
 
-  div.innerHTML = `
-    <div class="card-top">
-      <div class="question clickable">Q：${item.question}</div>
-      <div class="actions">
-        <button class="edit-a">回答</button>
-        <button class="delete">削除</button>
-      </div>
-    </div>
+    div.innerHTML = `
+    <div class="question clickable">Q：${item.question}</div>
 
     <div class="answers">
       <div class="answer-box answer-nana">
-        ${item.answers.nana || "<span class='muted'>未入力</span>"}
+        ${item.answers?.nana || "<span class='muted'>なな未回答</span>"}
       </div>
       <div class="answer-box answer-rei">
-        ${item.answers.rei || "<span class='muted'>未入力</span>"}
+        ${item.answers?.rei || "<span class='muted'>レイ未回答</span>"}
       </div>
     </div>
-  `;
+    <button class="edit">回答</button>
+   `;
 
-  /* 質問クリックで開閉 */
+  /* 開閉 */
   div.querySelector(".question").onclick = () => {
     div.classList.toggle("open");
   };
 
-  /* 削除 */
-  div.querySelector(".delete").onclick = async () => {
-    if (!confirm("削除する？")) return;
-    await db.collection("values").doc(item.id).delete();
+  /* 回答 */
+  div.querySelector(".edit").onclick = async () => {
+    if (!currentUser) return alert("ユーザーを選んでね");
+
+    const label = currentUser === "nana" ? "なな" : "レイ";
+    const t = prompt(`${label}の回答`, item.answers[currentUser]);
+    if (t === null) return;
+
+    item.answers[currentUser] = t;
+    item.updatedAt = Date.now();
+
+    await db.collection("values").doc(item.id).set(item);
   };
 
   return div;
 }
 
+
 /* 戻る */
-backBtn.onclick = () => location.hash = "";
+document.getElementById("backBtn").onclick = () => {
+  location.hash = "";
+};
