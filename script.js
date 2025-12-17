@@ -77,8 +77,9 @@ function render() {
 /* ===== カテゴリページ ===== */
 if (currentCategory) {
   const catName = decodeURIComponent(currentCategory);
+
   items
-    .filter(i => i.category === cat)
+    .filter(i => i.category === catName) // ← 修正ポイント
     .forEach(item => categoriesEl.appendChild(card(item)));
   return;
 }
