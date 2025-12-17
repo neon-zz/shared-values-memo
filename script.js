@@ -163,3 +163,5 @@ backBtn.onclick = () => location.hash = "";
 window.addEventListener("hashchange", () => {
   render();
 });
+// 初回描画を必ず実行
+render();
