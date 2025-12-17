@@ -26,7 +26,7 @@ const addArea = document.getElementById("addArea");
 /* ===== ユーザー管理 ===== */
 
 // ユーザー選択時に呼ばれる
-function setUser(user) {
+window.setUser = function (user) {
   currentUser = user;
   localStorage.setItem("user", user);
 
@@ -155,7 +155,7 @@ function card(item) {
   div.querySelector(".edit-a").onclick = async () => {
     if (!currentUser) return alert("ユーザーを選んでね");
 
-    const label = currentUser === "nana" ? "なな" : "レイ";
+    const label = currentUser === "nana" ? "なな" : "ゆう";
     const t = prompt(`${label}の回答`, item.answers[currentUser]);
     if (t === null) return;
 
