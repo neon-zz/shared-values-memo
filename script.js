@@ -73,17 +73,21 @@ document.getElementById("add").onclick = async () => {
   const question = document.getElementById("question").value.trim();
   if (!question) return alert("質問を入力してね");
 
+  const ref = db.collection("values").doc(); // ← 先にID作る
+
   const item = {
+    id: ref.id, // ← これが超重要
     category,
     question,
     answers: { nana: "", rei: "" },
     updatedAt: Date.now()
   };
 
-  await db.collection("values").add(item);
+  await ref.set(item);
 
   document.getElementById("question").value = "";
 };
+
 
 /* ================================
   描画
@@ -100,18 +104,16 @@ function render() {
   addArea.style.display = currentCategory ? "none" : "block";
   backBtn.style.display = currentCategory ? "block" : "none";
 
-  /* ===== カテゴリページ ===== */
-  if (currentCategory) {
-    const catName = decodeURIComponent(currentCategory);
+/* ===== カテゴリページ ===== */
+if (currentCategory) {
+  const catName = decodeURIComponent(currentCategory);
 
-    // カードだけ表示
-    items
-      .filter(i => i.category === cat)
-      .forEach(item => categoriesEl.appendChild(card(item)));
+  items
+    .filter(i => i.category === catName)
+    .forEach(item => categoriesEl.appendChild(card(item)));
 
-    return;
-  }
-
+  return;
+}
 
   /* ===== 一覧ページ（フォルダUI） ===== */
   const grouped = {};
@@ -181,8 +183,8 @@ function card(item) {
     await db.collection("values").doc(item.id).set(item);
   };
 
-  // 削除（←これが無かった）
-  div.querySelector(".delete").onclick = async () => {
+  // 削除
+  div.querySelector(".edit-a").onclick = async () => {
     if (!confirm("この質問を削除する？")) return;
     await db.collection("values").doc(item.id).delete();
   };
