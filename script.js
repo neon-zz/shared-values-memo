@@ -66,6 +66,14 @@ document.getElementById("add").onclick = async () => {
 function render() {
     categoriesEl.innerHTML = "";
 
+      const searchWord = document
+    .getElementById("search")
+    ?.value
+    .trim();
+
+      // ★ 追加：未回答フィルター
+  const filter = document.getElementById("filter")?.value;
+
   // URLの #category を取得
   const hash = new URLSearchParams(location.hash.slice(1));
   const currentCategory = hash.get("category");
@@ -80,13 +88,23 @@ if (currentCategory) {
 
 items
   .filter(item => {
+    if (item.category !== catName) return false;
+
+    // ★ 検索フィルター
     if (searchWord && !item.question.includes(searchWord)) return false;
 
+    // ★ 未回答フィルター
     if (filter === "nana" && item.answers.nana) return false;
     if (filter === "rei" && item.answers.rei) return false;
 
     return true;
+  })
+  .forEach(item => {
+    categoriesEl.appendChild(card(item));
   });
+
+
+  return; // ← 超重要：下のフォルダUIを表示させない
 }
 
   /* ===== 一覧ページ（フォルダUI） ===== */
@@ -99,7 +117,7 @@ items
 Object.keys(grouped).forEach(cat => {
   const list = grouped[cat];
 
-  // ★ 未回答数を数える
+  // 未回答数を数える
   const unansweredCount = list.filter(item =>
     !item.answers.nana || !item.answers.rei
   ).length;
@@ -185,6 +203,9 @@ div.querySelector(".delete").onclick = async () => {
   return div;
 }
 
+document.getElementById("filter").addEventListener("change", render);
+document.getElementById("search").addEventListener("input", render);
+
 /* 戻る */
 backBtn.onclick = () => location.hash = "";
 
@@ -192,5 +213,3 @@ backBtn.onclick = () => location.hash = "";
 window.addEventListener("hashchange", () => {
   render();
 });
-// 初回描画を必ず実行
-render();
