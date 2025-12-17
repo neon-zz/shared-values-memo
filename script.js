@@ -23,18 +23,36 @@ const filterEl = document.getElementById("filter");
 const backBtn = document.getElementById("backBtn");
 const addArea = document.getElementById("addArea");
 
-/* ===== ユーザー選択 ===== */
+/* ===== ユーザー管理 ===== */
+
+// ユーザー選択時に呼ばれる
 function setUser(user) {
   currentUser = user;
   localStorage.setItem("user", user);
-  document.getElementById("userSelect").style.display = "none";
+
+  // ユーザー選択画面を消す
+  const select = document.getElementById("userSelect");
+  if (select) select.style.display = "none";
+
+  // 画面を再描画（← これが重要）
+  render();
 }
 
+// ページ読み込み時
 window.onload = () => {
+  const select = document.getElementById("userSelect");
+
   if (currentUser) {
-    document.getElementById("userSelect").style.display = "none";
+    // すでに選択済みなら最初から非表示
+    if (select) select.style.display = "none";
+  } else {
+    // 未選択なら強制表示
+    if (select) select.style.display = "flex";
   }
+
+  render();
 };
+
 
 /* ================================
   Firestore 読み込み（最重要）
