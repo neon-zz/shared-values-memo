@@ -349,16 +349,25 @@ button:active,
 }
 /*  iPhone用「開く」ボタン　*/
 .open-btn {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 18px;
   border-radius: 999px;
-  background: #0077cc;
-  color: #fff;
-  font-size: 14px;
+
+  background-color: #0077cc;
+  color: #ffffff !important;     /* ← 強制表示 */
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;                /* ← Safari対策 */
+
   text-decoration: none;
   white-space: nowrap;
 }
 
-/* タップしやすく */
+
+/* 押した感覚 */
 .open-btn:active {
   opacity: 0.7;
 }
