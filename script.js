@@ -97,10 +97,12 @@ Object.keys(grouped).forEach(cat => {
 
   const header = document.createElement("div");
   header.className = "folder-header";
-  header.innerHTML = `
-    <span>${cat}（${grouped[cat].length}）</span>
-    <a href="#category=${encodeURIComponent(cat)}">開く</a>
-  `;
+header.innerHTML = `
+  <span>${cat}（${grouped[cat].length}）</span>
+  <a href="#category=${encodeURIComponent(cat)}" class="open-btn">
+    開く
+  </a>
+`;
 
   folder.appendChild(header);
   categoriesEl.appendChild(folder);

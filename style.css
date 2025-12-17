@@ -347,3 +347,30 @@ button:active,
   height: 52px;
   border-radius: 999px;
 }
+/*  iPhone用「開く」ボタン　*/
+.open-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #0077cc;
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* タップしやすく */
+.open-btn:active {
+  opacity: 0.7;
+}
+
+/* 📱 iPhone（小画面）最適化 */
+@media (max-width: 480px) {
+  .open-btn {
+    padding: 10px 18px;
+    font-size: 16px;
+  }
+
+  .folder-header {
+    gap: 12px;
+  }
+}
