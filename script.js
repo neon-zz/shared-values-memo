@@ -3,14 +3,22 @@
 ================================ */
 
 /* ===== Firebase 初期化 ===== */
-const firebaseConfig = {
-    apiKey: "AIzaSyCDG1H71ESjGJQ5NV25Tc7NYBBfUDw",
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCDG1H71ESjGZ26GJQ5NV25Tc7NYBBfUDw",
     authDomain: "shared-values-memo.firebaseapp.com",
     projectId: "shared-values-memo",
-};
+    storageBucket: "shared-values-memo.firebasestorage.app",
+    messagingSenderId: "395861138372",
+    appId: "1:395861138372:web:4f646d0a2d90e0d313a291",
+    measurementId: "G-D18EQHMYDF"
+  };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
 
 /* ===== 状態 ===== */
 let items = [];
