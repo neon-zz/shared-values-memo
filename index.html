@@ -18,9 +18,11 @@
   <!-- タイトル -->
   <h1 class="title">価値観共有</h1>
 
-  <!-- 戻るボタン（カテゴリページ時のみJSで表示） -->
-   <div id="categories"></div>
-   <button id="backBtn">← 一覧に戻る</button>
+<!-- 戻るボタン -->
+<button id="backBtn" style="display:none;">← 一覧に戻る</button>
+
+<!-- 描画エリア（1つだけ！） -->
+<div id="categories"></div>
 
   <input id="search" placeholder="検索" />
   <!-- 未回答フィルター -->
@@ -60,12 +62,9 @@
     <button id="add">質問を保存</button>
   </section>
 
-  <!-- 描画エリア -->
-  <div id="categories"></div>
-
   <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
 
 <!-- あなたのJS -->
 <script src="script.js"></script>

@@ -51,10 +51,12 @@ window.onload = () => {
 /* ================================
   Firestore 読み込み（最重要）
 ================================ */
-db.collection("values").onSnapshot(snap => {
-  items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  render();
-});
+db.collection("values")
+  .orderBy("updatedAt") // ← これを追加
+  .onSnapshot(snap => {
+    items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    render();
+  });
 
 /* ================================
   Firestore 保存
@@ -170,24 +172,24 @@ function card(item) {
     div.classList.toggle("open");
   };
 
-  /* 回答 */
-  div.querySelector(".edit").onclick = async () => {
-    if (!currentUser) return alert("ユーザーを選んでね");
+/* 回答 */
+div.querySelector(".edit-a").onclick = async () => {
+  if (!currentUser) return alert("ユーザーを選んでね");
 
-    const t = prompt("回答", item.answers[currentUser]);
-    if (t === null) return;
+  const t = prompt("回答", item.answers[currentUser]);
+  if (t === null) return;
 
-    item.answers[currentUser] = t;
-    item.updatedAt = Date.now();
+  item.answers[currentUser] = t;
+  item.updatedAt = Date.now();
 
-    await db.collection("values").doc(item.id).set(item);
-  };
+  await db.collection("values").doc(item.id).set(item);
+};
 
-  // 削除
-  div.querySelector(".edit-a").onclick = async () => {
-    if (!confirm("この質問を削除する？")) return;
-    await db.collection("values").doc(item.id).delete();
-  };
+/* 削除 */
+div.querySelector(".delete").onclick = async () => {
+  if (!confirm("この質問を削除する？")) return;
+  await db.collection("values").doc(item.id).delete();
+};
 
   return div;
 }
@@ -196,3 +198,5 @@ function card(item) {
 document.getElementById("backBtn").onclick = () => {
   location.hash = "";
 };
+
+window.addEventListener("hashchange", render);
