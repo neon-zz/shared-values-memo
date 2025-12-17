@@ -213,7 +213,7 @@ div.innerHTML = `
    /* ===== 回答者選択 ===== */
   div.querySelector(".edit-a").onclick = () => {
     const who = prompt(
-      "誰の回答を編集しますか？\n\n1：私（なな）\n2：レイ",
+    "誰の回答を編集しますか？\n\n1：私（なな）\n2：レイ",
       "1"
     );
     if (who === null) return;
