@@ -156,3 +156,8 @@ div.querySelector(".delete").onclick = async () => {
 
 /* 戻る */
 backBtn.onclick = () => location.hash = "";
+
+// URLの # が変わったら再描画
+window.addEventListener("hashchange", () => {
+  render();
+});
