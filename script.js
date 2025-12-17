@@ -90,19 +90,20 @@ if (currentCategory) {
     grouped[i.category].push(i);
   });
 
-  Object.keys(grouped).forEach(cat => {
-    const folder = document.createElement("div");
-    folder.className = "folder";
+Object.keys(grouped).forEach(cat => {
+  const folder = document.createElement("div");
+  folder.className = "folder";
 
-    folder.innerHTML = `
-      <div class="folder-header">
-        <span>${cat}（${grouped[cat].length}）</span>
-        <a href="#category=${encodeURIComponent(cat)}">開く</a>
-      </div>
-    `;
+  const header = document.createElement("div");
+  header.className = "folder-header";
+  header.innerHTML = `
+    <span>${cat}（${grouped[cat].length}）</span>
+    <a href="#category=${encodeURIComponent(cat)}">開く</a>
+  `;
 
-    categoriesEl.appendChild(folder);
-  });
+  folder.appendChild(header);
+  categoriesEl.appendChild(folder);
+});
 }
 
 /* ===== カード ===== */
