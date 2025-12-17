@@ -86,25 +86,16 @@ function render() {
 if (currentCategory) {
   const catName = decodeURIComponent(currentCategory);
 
-items
-  .filter(item => {
-    if (item.category !== catName) return false;
+  // ★ カテゴリタグ描画
+  renderCategoryTabs(catName);
 
-    // ★ 検索フィルター
-    if (searchWord && !item.question.includes(searchWord)) return false;
+  items
+    .filter(item => item.category === catName)
+    .forEach(item => {
+      categoriesEl.appendChild(card(item));
+    });
 
-    // ★ 未回答フィルター
-    if (filter === "nana" && item.answers.nana) return false;
-    if (filter === "rei" && item.answers.rei) return false;
-
-    return true;
-  })
-  .forEach(item => {
-    categoriesEl.appendChild(card(item));
-  });
-
-
-  return; // ← 超重要：下のフォルダUIを表示させない
+  return;
 }
 
   /* ===== 一覧ページ（フォルダUI） ===== */
@@ -201,6 +192,28 @@ div.querySelector(".delete").onclick = async () => {
 };
 
   return div;
+}
+
+function renderCategoryTabs(activeCat) {
+  const tabsEl = document.getElementById("categoryTabs");
+  tabsEl.innerHTML = "";
+
+  // 全カテゴリ取得（重複なし）
+  const categories = [...new Set(items.map(i => i.category))];
+
+  categories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "category-tab";
+    if (cat === activeCat) btn.classList.add("active");
+
+    btn.textContent = cat;
+
+    btn.onclick = () => {
+      location.hash = `category=${encodeURIComponent(cat)}`;
+    };
+
+    tabsEl.appendChild(btn);
+  });
 }
 
 document.getElementById("filter").addEventListener("change", render);

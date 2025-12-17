@@ -388,3 +388,33 @@ button:active,
   color: #e67e22;
   margin-left: 6px;
 }
+/* 両方未回答 */
+.card.both-unanswered {
+  border-left: 6px solid #e53935;
+  background: #fff5f5;
+}
+
+/* どちらか未回答 */
+.card.has-unanswered {
+  border-left: 6px solid #fbc02d;
+}
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0;
+  overflow-x: auto;
+}
+
+.category-tab {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #eee;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.category-tab.active {
+  background: #1976d2;
+  color: #fff;
+}
