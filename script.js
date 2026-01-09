@@ -35,6 +35,11 @@ filterSelect.addEventListener("change", () => {
   render();
 });
 
+const USER_LABEL = {
+  nana: "なな",
+  rei: "ゆう"
+};
+
 
 // ユーザー選択時に呼ばれる
 window.setUser = function(user) {
@@ -196,24 +201,28 @@ function card(item) {
     div.classList.add("has-unanswered");
   }
 
-  div.innerHTML = `
-    <div class="card-top">
-      <div class="question clickable">Q：${item.question}</div>
-      <div class="actions">
-        <button class="edit-a">回答</button>
-        <button class="delete">削除</button>
-      </div>
+div.innerHTML = `
+  <div class="card-top">
+    <div class="question clickable">Q：${item.question}</div>
+    <div class="actions">
+      <button class="edit-a">回答</button>
+      <button class="delete">削除</button>
+    </div>
+  </div>
+
+  <div class="answers">
+    <div class="answer-box answer-nana">
+      <div class="answer-label">${USER_LABEL.nana}</div>
+      ${item.answers.nana || "<span class='muted'>未入力</span>"}
     </div>
 
-    <div class="answers">
-      <div class="answer-box answer-nana">
-        ${item.answers.nana || "<span class='muted'>未入力</span>"}
-      </div>
-      <div class="answer-box answer-rei">
-        ${item.answers.rei || "<span class='muted'>未入力</span>"}
-      </div>
+    <div class="answer-box answer-rei">
+      <div class="answer-label">${USER_LABEL.rei}</div>
+      ${item.answers.rei || "<span class='muted'>未入力</span>"}
     </div>
-  `;
+  </div>
+`;
+
 
   /* 開閉 */
   div.querySelector(".question").onclick = () => {
