@@ -79,7 +79,32 @@ document.getElementById("add").onclick = async () => {
 
 /* ===== 描画 ===== */
 function render() {
-    categoriesEl.innerHTML = "";
+  categoriesEl.innerHTML = "";
+
+  /* ===== 今日の1問 ===== */
+  const todayBox = document.getElementById("todayBox");
+  const todayQ = document.getElementById("todayQuestion");
+  const todayBtn = document.getElementById("todayAnswerBtn");
+
+  const todayItem = pickTodayQuestion();
+
+  // カテゴリを開いていない時だけ表示
+  if (todayItem && !location.hash) {
+    todayBox.style.display = "block";
+    todayQ.textContent = "Q：" + todayItem.question;
+
+    todayBtn.onclick = async () => {
+      const t = prompt("回答", todayItem.answers[currentUser] || "");
+      if (t === null) return;
+
+      todayItem.answers[currentUser] = t;
+      todayItem.updatedAt = Date.now();
+
+      await db.collection("values").doc(todayItem.id).set(todayItem);
+    };
+  } else {
+    todayBox.style.display = "none";
+  }
 
   // URLの #category を取得
   const hash = new URLSearchParams(location.hash.slice(1));
@@ -244,3 +269,18 @@ backBtn.onclick = () => location.hash = "";
 window.addEventListener("hashchange", () => {
   render();
 });
+
+// 今日の一問
+function pickTodayQuestion() {
+  if (!currentUser) return null;
+
+  // 未回答の質問だけ
+  const unanswered = items.filter(item => {
+    return !item.answers[currentUser];
+  });
+
+  if (unanswered.length === 0) return null;
+
+  // ランダム1問
+  return unanswered[Math.floor(Math.random() * unanswered.length)];
+}
