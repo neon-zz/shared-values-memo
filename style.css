@@ -209,24 +209,14 @@ button {
 
 /* なな回答 */
 .answer-nana {
-  background: #fdf0f8;
+  background: #f8c2e3;
 }
-
-.answer-nana::before {
-  content: "彼女";
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
 /* ゆう回答 */
 .answer-rei {
-  background: #eef4ff;
+  background: #cbdaf7;
 }
 
-.answer-rei::before {
-  content: "彼氏";
+.answer-label {
   display: block;
   font-size: 12px;
   font-weight: 700;
